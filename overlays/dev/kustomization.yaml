@@ -1,0 +1,7 @@
+resources:
+- deployment.yaml
+- mqtt-<machine-name>-global-devices-config.yaml
+- mqtt-<machine-name>-global-devices-secret.yaml
+- mqtt-<machine-name>-app-config.yaml
+- oisp-token-operator-secret.yaml
+- oisp-token-operator-role-binding.yaml

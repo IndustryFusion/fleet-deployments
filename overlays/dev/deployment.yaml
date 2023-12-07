@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <machine name>
+  labels:
+    app: <machine name>-oisp-sensor
+spec:
+  selector:
+    matchLabels:
+      app: <machine name>-oisp-sensor
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: <machine name>-oisp-sensor
+    spec:
+      serviceAccountName: kopfexample-account
+      restartPolicy: Always
+      containers:
+        - name: busybox
+          image: docker.io/busybox:latest
+          imagePullPolicy: Always
+          command: ["sleep"]
+          args: ["100000000"]
+        - name: fusionmqttdataservice
+          env:
+            - name: BROKER_URL
+              value: "<MQTT broker URL>"
+            - name: BROKER_PORT
+              value: "1883"
+            - name: OISP_URL
+              value: "127.0.0.1"
+            - name: SLEEP
+              value: '1'
+            - name: OISP_PORT
+              value: "7070"
+            - name: OISP_API_ROOT
+              value: https://<PDT URL>/oisp/v1/api
+            - name: USERNAME
+              value: <Username of admin in PDT keycloak>
+            - name: OISP_DEVICE_ID
+              value: "<Asset ID of the machine in PDT-scorpio to which the data must be sent>"
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: oisp-password-secret
+          image: <fusion MQTT data service docker image name and version>
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: dataservice-machine-config
+              mountPath: /resources/config.json
+              subPath: config.json
+        - name: oisp-iot-agent
+          env:
+            - name: OISP_DEVICE_ID
+              value: "<Asset ID of the machine in PDT-scorpio to which the data must be sent>"
+            - name: OISP_DEVICE_NAME
+              value: "<Asset ID of the machine in PDT-scorpio to which the data must be sent>"
+            - name: OISP_GATEWAY_ID
+              value: "<Asset ID of the machine in PDT-scorpio to which the data must be sent>"
+            - name: OISP_DEVICE_ACTIVATION_CODE
+              valueFrom:
+                secretKeyRef:
+                  key: activation-code
+                  name: <Name of the secret that contains OISP activation code>
+          volumeMounts:
+            - name: oisp-devices-config-volume
+              mountPath: /volume/config
+          securityContext:
+            privileged: true
+            capabilities:
+              drop:
+                - all
+          image: <OISP agent Docker image name and version>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 41234
+              hostPort: 41234
+            - containerPort: 7070
+              hostPort: 7070
+        - name: oisp-token-operator
+          image: <OISP token operator Docker image name and version>
+          imagePullPolicy: Always
+          env:
+            - name: OISP_API_ROOT
+              value: https://<PDT URL>/oisp/v1/api
+            - name: USERNAME
+              value: <Username of admin in PDT keycloak>
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: oisp-password-secret
+          securityContext:
+            privileged: true
+      volumes:
+        - name: oisp-devices-config-volume
+          configMap:
+            name: <Name of the configmap that contains OISP device config>
+            items:
+              - key: config.json
+                path: config.json
+        - name: dataservice-machine-config
+          configMap:
+            name: <Name of the configmap that contains OPC-UA machine config>
+            items:
+            - key: config.json
+              path: config.json
+      imagePullSecrets:
+        - name: regcred
+      # nodeSelector:
+      #   kubernetes.io/hostname: m-3384eee4-d96c-49c0-8ecb-3feaa267213a

@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  config.json: |
+    {
+      "fusionmqttdataservice": {
+          "specification": [
+              {
+                  "topic": "<some topic>",
+                  "key": ["<some key>"],
+                  "parameter": ["<some PDT property>"]
+              }
+              {
+                  "topic": "<some topic>,
+                  "key": ["<some key>", "<some key>"],
+                  "parameter": ["<some PDT property>", "<some PDT property>"]
+              }
+          ]
+      }
+    }
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: <Name of the configmap for MQTT topic config>

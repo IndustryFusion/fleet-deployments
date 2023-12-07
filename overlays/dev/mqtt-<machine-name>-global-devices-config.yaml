@@ -1,0 +1,49 @@
+apiVersion: v1
+data:
+  config.json: |
+    {
+                "data_directory": "./data",
+                "listeners": {
+                        "rest_port": 8000,
+                        "udp_port": 41234,
+                        "tcp_port": 7070
+                },
+                "receivers": {
+                        "udp_port": 41235,
+                        "udp_address": "127.0.0.1"
+                },
+                "logger": {
+                        "level": "info",
+                        "path": "/tmp/",
+                        "max_size": 134217728
+                },
+                "connector": {
+                        "rest": {
+                                "host": "<PDT URL>",
+                                "port": <443 for HTTPS, 80 for HTTP>,
+                                "protocol": "<https or http>",
+                                "strictSSL": false,
+                                "timeout": 30000,
+                                "proxy": {
+                                        "host": false,
+                                        "port": false
+                                }
+                        },
+                        "mqtt": {
+                                "host": "<PDT URL>",
+                                "port": <1883 or 8883>,
+                                "websockets": false,
+                                "qos": 1,
+                                "retain": false,
+                                "secure": true,
+                                "retries": 5,
+                                "strictSSL": false,
+                                "sparkplugB": true,
+                                "version": "spBv1.0"        
+                        }
+                }
+        }
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: <Name of the configmap for OISP device config>
