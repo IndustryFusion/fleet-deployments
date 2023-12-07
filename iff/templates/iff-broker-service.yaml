@@ -100,14 +100,14 @@ data:
        "fusionopcuadataservice": {
            "specification": [
               {
-                  "node_id": "ns=4",
-                  "identifier": "i=39",
-                  "parameter": "filter-v0.1-filter-runtime-machine-state"
+                  "node_id": "<some namespace>",
+                  "identifier": "<some identifier>",
+                  "parameter": "<some PDT property>"
               },
               {
-                  "node_id": "some namespace",
-                  "identifier": "some identifier",
-                  "parameter": "some PDT property"
+                  "node_id": "<some namespace>",
+                  "identifier": "<some identifier>",
+                  "parameter": "<some PDT property>"
               }
            ]
        }
